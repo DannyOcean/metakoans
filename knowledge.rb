@@ -12,11 +12,11 @@ class Module
 
 		unless arg.is_a?(Hash)
 			define_method "#{arg}=" do |val|
-				@arg = val 
+				block_given? ? @arg = block.call : @arg = val 
 			end
 		else
 			define_method "#{arg.keys[0]}=" do |val|
-				arg[arg.keys[0]] = val
+				block_given? ? arg[arg.keys[0]] = block.call : arg[arg.keys[0]] = val
 			end
 		end
 
@@ -32,17 +32,19 @@ class Module
 	end
 end
 
-    c = Class::new {
-      attribute 'a'
-    }
-    o = Class::new {
-      class << self
-        attribute 'a'
+c = Class::new {
+      attribute('a'){ fortytwo }
+      def fortytwo
+        42
       end
     }
+
+    o = c::new
+
 
 puts "EMPTY" if o.a.nil?
 puts o.a == 42
 puts o.a?
 o.a = 1
 puts "FCK YEAH" if o.a == 1
+puts "FCK YEAH V2" if (o.a = nil) == nil
