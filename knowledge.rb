@@ -1,48 +1,25 @@
 class Module
 	def attribute(arg = {}, &block)		
-		unless arg.is_a?(Hash)
-			define_method arg do
-				@arg
-			end
+		attribute, value = 
+		if arg.is_a?(Hash)
+			attribute = arg.keys[0]
+			value = arg.values[0]
 		else
-			define_method "#{arg.keys[0]}" do			
-				arg.values.first
-			end
-		end	
-
-		unless arg.is_a?(Hash)
-			define_method "#{arg}=" do |val|
-				@arg = val 
-			end
-		else
-			define_method "#{arg.keys[0]}=" do |val|
-				arg[arg.keys[0]] = val
-			end
+			attribute = arg
 		end
 
-		unless arg.is_a?(Hash)
-			define_method "#{arg}?" do
-				true if respond_to?(arg)
-			end
-		else
-			define_method "#{arg.keys[0]}?" do
-				true if respond_to?(arg.keys[0])
-			end
+		define_method attribute do
+			value = instance_eval(&block) if block_given?
+			@attribute = value
+		end
+
+		define_method "#{attribute}?" do
+			@attribute.nil? ? false : true
+		end
+
+		define_method "#{attribute}=" do |val|
+			value = val
+			@attribute = value
 		end
 	end
 end
-
-    c = Class::new {
-      attribute 'a'
-    }
-    o = Class::new {
-      class << self
-        attribute 'a'
-      end
-    }
-
-puts "EMPTY" if o.a.nil?
-puts o.a == 42
-puts o.a?
-o.a = 1
-puts "FCK YEAH" if o.a == 1
