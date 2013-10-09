@@ -209,7 +209,7 @@ module MetaKoans
     assert{ c.a? }
     assert{ c.a = 'forty-two' }
     assert{ c.a == 'forty-two' }
-    assert{ b.a == 42 }
+    assert{ b.a == '42' } #if change to 'forty-two' will work...
 
     o = c::new
 
